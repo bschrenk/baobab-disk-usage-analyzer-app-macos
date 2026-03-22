@@ -90,7 +90,7 @@ jobs:
       - name: Install dependencies
         run: |
           brew update
-          brew install meson ninja pkgconf vala gettext itstool desktop-file-utils dylibbundler
+          brew install meson ninja pkgconf vala gettext itstool desktop-file-utils
           brew install gtk4 libadwaita glib pango cairo graphene adwaita-icon-theme hicolor-icon-theme librsvg
 
       - name: Download source
