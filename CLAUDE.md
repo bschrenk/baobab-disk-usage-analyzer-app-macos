@@ -4,10 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Repo Does
 
-**Baobab** (Disk Usage Analyzer) is a GNOME application that helps users manage storage by scanning folders and devices and visualizing where disk space is used. It provides both a tree view and a graphical ring chart for exploring folder sizes. Upstream project: https://apps.gnome.org/Baobab/ — maintained by the GNOME project (Paolo Borelli, Christopher Davis), licensed GPL-2.0+.
+**Baobab** (Disk Usage Analyzer) is a GNOME application that helps users manage storage by scanning folders and devices and visualizing where disk space is used. It provides both a tree view and a graphical ring chart for exploring folder sizes. It is a free alternative to paid apps like [DaisyDisk](https://daisydiskapp.com/) and [SquirrelDisk](https://www.squirreldisk.com/). Upstream project: https://apps.gnome.org/Baobab/ — maintained by the GNOME project (Paolo Borelli, Christopher Davis), licensed GPL-2.0+.
 
 This repo is a **CI/CD packaging pipeline** whose primary purpose is to produce a versioned `Baobab.dmg` and `Baobab.app` for the **`baobab-app` Homebrew Cask** formula. The cask formula references the GitHub Release URL and SHA256 from this repo's releases. It does not contain Baobab source code. It automates:
-1. Detecting new upstream GNOME Baobab releases (weekly cron job, Mondays)
+1. Detecting new upstream GNOME Baobab releases (daily cron job)
 2. Building Baobab on macOS from the upstream source tarball
 3. Wrapping the result in a macOS `.app` bundle
 4. Packaging as a DMG and publishing a GitHub Release (the artifact the Homebrew cask points to)
@@ -16,6 +16,7 @@ This repo is a **CI/CD packaging pipeline** whose primary purpose is to produce 
 
 - `.github/workflows/build.yml` — the entire pipeline (version check → tag → build → release)
 - `scripts/create_app.sh` — creates the macOS `.app` bundle from a compiled Meson install prefix
+- `homebrew-cask/Casks/b/baobab-app.rb` — the Homebrew Cask formula (fork of [Homebrew/homebrew-cask](https://github.com/Homebrew/homebrew-cask) with a PR open for inclusion)
 
 ## Local Build
 
@@ -66,3 +67,13 @@ Takes the Meson install prefix as its only argument and produces `Baobab.app` in
 - Converts the upstream SVG icon to `.icns` using `rsvg-convert` and `iconutil`
 
 **Important:** The launcher script embeds the absolute `PREFIX` path at build time. This means the app bundle is not relocatable — it depends on the Homebrew-installed libraries at the path where they were built.
+
+## Gatekeeper
+
+The app is not signed with an Apple Developer certificate. Users will need to bypass Gatekeeper on first launch:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/Baobab.app
+```
+
+Or right-click `Baobab.app` → **Open** → **Open** in the dialog.

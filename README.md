@@ -4,6 +4,8 @@ An unofficial macOS build of [Baobab](https://apps.gnome.org/Baobab/), the GNOME
 
 Baobab helps you understand where your disk space is going. It scans folders and storage devices and visualizes the results as an interactive ring chart and tree view.
 
+Looking for a free alternative to [DaisyDisk](https://daisydiskapp.com/) or [SquirrelDisk](https://www.squirreldisk.com/)? Baobab offers the same kind of visual map — its unique circular interface lets you instantly spot what is consuming the most space.
+
 ## Installing via Homebrew
 
 If `baobab-app` is available in the official [homebrew-cask](https://github.com/Homebrew/homebrew-cask) tap:
@@ -25,6 +27,16 @@ brew install --cask bschrenk/homebrew-cask/baobab-app
 Download the latest `Baobab.dmg` from the [Releases](../../releases) page, open it, and drag `Baobab.app` to your Applications folder.
 
 **Requirements:** macOS 11.0 (Big Sur) or later.
+
+### Gatekeeper Warning
+
+This app is not signed with an Apple Developer certificate, so macOS will block it on first launch. To allow it:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/Baobab.app
+```
+
+Or right-click `Baobab.app` → **Open** → **Open** in the dialog.
 
 ## Purpose of This Repository
 
