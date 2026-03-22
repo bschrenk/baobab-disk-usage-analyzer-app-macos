@@ -145,6 +145,20 @@ for lib in "$FRAMEWORKS/"*.dylib; do
 done
 
 ########################################
+# Re-sign everything (install_name_tool invalidates existing signatures;
+# Apple Silicon requires all code to be signed, even ad-hoc)
+########################################
+echo "Ad-hoc signing binaries..."
+codesign --force --sign - "$MACOS/baobab-bin"
+for lib in "$FRAMEWORKS/"*.dylib; do
+  [ -f "$lib" ] && codesign --force --sign - "$lib"
+done
+# Sign pixbuf loaders if present
+find "$RESOURCES/lib" -name "*.so" 2>/dev/null | while read -r so; do
+  codesign --force --sign - "$so"
+done
+
+########################################
 # Launcher script
 ########################################
 cat > "$MACOS/Baobab" << 'LAUNCHER'
