@@ -32,7 +32,7 @@ This repo is a **CI/CD packaging pipeline** whose primary output is a versioned 
 
 It does not contain Baobab's source code. Each release:
 
-1. **Detects** new upstream releases from [download.gnome.org](https://download.gnome.org/sources/baobab/) (checked weekly, Mondays)
+1. **Detects** new upstream releases from [download.gnome.org](https://download.gnome.org/sources/baobab/) (checked daily)
 2. **Builds** Baobab on macOS using Homebrew-provided GTK4/GNOME dependencies and the Meson build system
 3. **Packages** the result as a macOS `.app` bundle and `.dmg` installer
 4. **Publishes** a GitHub Release with the DMG attached — the URL and SHA256 are what the `baobab-app` cask formula references

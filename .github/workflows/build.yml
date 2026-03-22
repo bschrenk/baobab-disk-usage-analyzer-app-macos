@@ -2,7 +2,7 @@ name: Build Baobab macOS App
 
 on:
   schedule:
-    - cron: "0 6 * * 1"   # weekly check (Mondays)
+    - cron: "0 6 * * *"   # daily check
   workflow_dispatch:
     inputs:
       version:
