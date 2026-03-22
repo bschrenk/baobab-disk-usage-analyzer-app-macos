@@ -1,0 +1,141 @@
+name: Build Baobab macOS App
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"   # weekly check (Mondays)
+  workflow_dispatch:      # manual trigger
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  ########################################
+  # 🔍 Check for latest GNOME version
+  ########################################
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+      should_build: ${{ steps.check_tag.outputs.should_build }}
+
+    steps:
+      - name: Get latest version
+        id: get_version
+        run: |
+          LATEST=$(curl -s https://download.gnome.org/sources/baobab/ \
+            | grep -Eo 'href="[0-9]+\.[0-9]+/' \
+            | sed 's/href="//;s#/##' \
+            | sort -V \
+            | tail -1)
+
+          echo "Latest version: $LATEST"
+          echo "version=$LATEST" >> $GITHUB_OUTPUT
+
+      - name: Check if tag exists
+        id: check_tag
+        run: |
+          TAG="v${{ steps.get_version.outputs.version }}"
+          if git ls-remote --tags https://github.com/${{ github.repository }}.git | grep -q "refs/tags/$TAG"; then
+            echo "Tag exists"
+            echo "should_build=false" >> $GITHUB_OUTPUT
+          else
+            echo "New version detected"
+            echo "should_build=true" >> $GITHUB_OUTPUT
+          fi
+
+  ########################################
+  # 🏷️ Create tag (if new version)
+  ########################################
+  tag:
+    needs: check
+    if: needs.check.outputs.should_build == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create tag
+        run: |
+          VERSION=${{ needs.check.outputs.version }}
+          TAG="v$VERSION"
+
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+          git tag "$TAG"
+          git push origin "$TAG"
+
+  ########################################
+  # 🍎 Build + Package on macOS
+  ########################################
+  build:
+    needs: [check, tag]
+    if: always() && (startsWith(github.ref, 'refs/tags/') || needs.check.outputs.should_build == 'true')
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set version
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/v}"
+          else
+            VERSION="${{ needs.check.outputs.version }}"
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: |
+          brew update
+          brew install meson ninja pkgconf vala gettext itstool desktop-file-utils
+          brew install gtk4 libadwaita glib pango cairo graphene adwaita-icon-theme hicolor-icon-theme librsvg
+
+      - name: Download source
+        run: |
+          curl -LO https://download.gnome.org/sources/baobab/${VERSION%.*}/baobab-${VERSION}.tar.xz
+          tar -xf baobab-${VERSION}.tar.xz
+
+      - name: Build
+        run: |
+          cd baobab-${VERSION}
+          meson setup build --prefix="$GITHUB_WORKSPACE/install"
+          meson compile -C build
+          meson install -C build
+
+      - name: Create app bundle
+        run: |
+          chmod +x scripts/create_app.sh
+          ./scripts/create_app.sh "$GITHUB_WORKSPACE/install"
+
+      - name: Create DMG
+        run: |
+          hdiutil create -volname "Baobab" -srcfolder Baobab.app -ov -format UDZO Baobab.dmg
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: baobab-${{ env.VERSION }}
+          path: |
+            Baobab.app
+            Baobab.dmg
+
+  ########################################
+  # 🚀 Create GitHub Release
+  ########################################
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: baobab-${{ github.ref_name }}
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: |
+            Baobab.dmg
