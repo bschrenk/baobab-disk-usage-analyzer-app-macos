@@ -6,11 +6,19 @@ Baobab helps you understand where your disk space is going. It scans folders and
 
 ## Installing via Homebrew
 
+If `baobab-app` is available in the official [homebrew-cask](https://github.com/Homebrew/homebrew-cask) tap:
+
 ```bash
 brew install --cask baobab-app
 ```
 
-> The `baobab-app` Homebrew cask points to the versioned `Baobab.dmg` published by this repository's CI pipeline.
+If the official cask is not yet available, you can install directly from this repository's cask:
+
+```bash
+brew install --cask bschrenk/homebrew-cask/baobab-app
+```
+
+> The `baobab-app` cask points to the versioned `Baobab.dmg` published by this repository's CI pipeline.
 
 ## Manual Installation
 
