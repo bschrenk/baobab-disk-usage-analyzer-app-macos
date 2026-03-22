@@ -114,12 +114,15 @@ jobs:
         run: |
           hdiutil create -volname "Baobab" -srcfolder Baobab.app -ov -format UDZO Baobab.dmg
 
+      - name: Zip app bundle
+        run: zip -r Baobab.app.zip Baobab.app
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: baobab-${{ env.VERSION }}
+          name: baobab-v${{ env.VERSION }}
           path: |
-            Baobab.app
+            Baobab.app.zip
             Baobab.dmg
 
   ########################################
@@ -143,3 +146,4 @@ jobs:
           tag_name: ${{ github.ref_name }}
           files: |
             Baobab.dmg
+            Baobab.app.zip
