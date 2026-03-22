@@ -22,9 +22,9 @@ jobs:
       - name: Get latest version
         id: get_version
         run: |
-          LATEST=$(curl -s https://download.gnome.org/sources/baobab/ \
-            | grep -Eo 'href="[0-9]+\.[0-9]+/' \
-            | sed 's/href="//;s#/##' \
+          LATEST=$(curl -s "https://api.github.com/repos/GNOME/baobab/tags?per_page=20" \
+            | grep '"name"' \
+            | grep -Eo '[0-9]+\.[0-9]+' \
             | sort -V \
             | tail -1)
 
@@ -50,6 +50,8 @@ jobs:
     needs: check
     if: needs.check.outputs.should_build == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
@@ -127,6 +129,8 @@ jobs:
     needs: build
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/download-artifact@v4
