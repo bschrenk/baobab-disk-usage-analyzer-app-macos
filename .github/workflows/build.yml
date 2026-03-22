@@ -129,8 +129,8 @@ jobs:
   # 🚀 Create GitHub Release
   ########################################
   release:
-    needs: build
-    if: startsWith(github.ref, 'refs/tags/')
+    needs: [check, build]
+    if: needs.build.result == 'success' && (startsWith(github.ref, 'refs/tags/') || needs.check.outputs.should_build == 'true')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -138,14 +138,14 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: baobab-${{ github.ref_name }}
+          name: baobab-v${{ needs.check.outputs.version }}
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
+          tag_name: v${{ needs.check.outputs.version }}
           body: |
-            ## Baobab ${{ github.ref_name }} — macOS Build
+            ## Baobab v${{ needs.check.outputs.version }} — macOS Build
 
             **Baobab** (Disk Usage Analyzer) is a GNOME application for visualizing where disk space is used. It provides a tree view and a ring chart for exploring folder and device sizes.
 
@@ -153,7 +153,7 @@ jobs:
 
             ### Upstream
             - Source: [GNOME/baobab on GitLab](https://gitlab.gnome.org/GNOME/baobab)
-            - Release notes: [baobab ${{ github.ref_name }} on GNOME releases](https://gitlab.gnome.org/GNOME/baobab/-/releases/${{ github.ref_name }})
+            - Release notes: [baobab v${{ needs.check.outputs.version }} on GNOME releases](https://gitlab.gnome.org/GNOME/baobab/-/releases/v${{ needs.check.outputs.version }})
 
             ### Installation
             1. Download `Baobab.dmg`
