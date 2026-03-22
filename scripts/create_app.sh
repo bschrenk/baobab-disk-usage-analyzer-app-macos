@@ -2,6 +2,7 @@
 set -euo pipefail
 
 PREFIX="${1:?Missing install prefix}"
+VERSION="${2:-}"
 BREW="$(brew --prefix)"
 APP="$PWD/Baobab.app"
 CONTENTS="$APP/Contents"
@@ -180,19 +181,22 @@ chmod +x "$MACOS/Baobab"
 ########################################
 # Info.plist
 ########################################
-cat > "$CONTENTS/Info.plist" << 'EOF'
+cat > "$CONTENTS/Info.plist" << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-  <key>CFBundleExecutable</key>       <string>Baobab</string>
-  <key>CFBundleIconFile</key>         <string>baobab</string>
-  <key>CFBundleIdentifier</key>       <string>org.gnome.baobab</string>
-  <key>CFBundleName</key>             <string>Baobab</string>
-  <key>CFBundleDisplayName</key>      <string>Disk Usage Analyzer</string>
-  <key>CFBundlePackageType</key>      <string>APPL</string>
-  <key>LSMinimumSystemVersion</key>   <string>11.0</string>
-  <key>NSHighResolutionCapable</key>  <true/>
+  <key>CFBundleExecutable</key>            <string>Baobab</string>
+  <key>CFBundleIconFile</key>              <string>baobab</string>
+  <key>CFBundleIdentifier</key>            <string>org.gnome.baobab</string>
+  <key>CFBundleName</key>                  <string>Baobab</string>
+  <key>CFBundleDisplayName</key>           <string>Disk Usage Analyzer</string>
+  <key>CFBundlePackageType</key>           <string>APPL</string>
+  <key>LSMinimumSystemVersion</key>        <string>11.0</string>
+  <key>NSHighResolutionCapable</key>       <true/>
+  <key>CFBundleShortVersionString</key>    <string>${VERSION}</string>
+  <key>CFBundleVersion</key>               <string>${VERSION}</string>
+  <key>NSHumanReadableCopyright</key>      <string>Copyright © The GNOME Project. Licensed under GPL-2.0+.</string>
 </dict>
 </plist>
 EOF
