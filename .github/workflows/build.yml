@@ -3,7 +3,12 @@ name: Build Baobab macOS App
 on:
   schedule:
     - cron: "0 6 * * 1"   # weekly check (Mondays)
-  workflow_dispatch:      # manual trigger
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to build (e.g. 47.0). Leave blank to build latest."
+        required: false
+        default: ""
   push:
     tags:
       - "v*"
@@ -22,20 +27,28 @@ jobs:
       - name: Get latest version
         id: get_version
         run: |
-          LATEST=$(curl -s "https://api.github.com/repos/GNOME/baobab/tags?per_page=20" \
-            | grep '"name"' \
-            | grep -Eo '[0-9]+\.[0-9]+' \
-            | sort -V \
-            | tail -1)
-
-          echo "Latest version: $LATEST"
+          if [[ -n "${{ inputs.version }}" ]]; then
+            LATEST="${{ inputs.version }}"
+            echo "Using manually specified version: $LATEST"
+          else
+            LATEST=$(curl -s "https://api.github.com/repos/GNOME/baobab/tags?per_page=20" \
+              | grep '"name"' \
+              | grep -Eo '[0-9]+\.[0-9]+' \
+              | sort -V \
+              | tail -1)
+            echo "Latest version: $LATEST"
+          fi
           echo "version=$LATEST" >> $GITHUB_OUTPUT
 
       - name: Check if tag exists
         id: check_tag
         run: |
           TAG="v${{ steps.get_version.outputs.version }}"
-          if git ls-remote --tags https://github.com/${{ github.repository }}.git | grep -q "refs/tags/$TAG"; then
+          # Always build if version was manually specified
+          if [[ -n "${{ inputs.version }}" ]]; then
+            echo "Manual version specified — forcing build"
+            echo "should_build=true" >> $GITHUB_OUTPUT
+          elif git ls-remote --tags https://github.com/${{ github.repository }}.git | grep -q "refs/tags/$TAG"; then
             echo "Tag exists"
             echo "should_build=false" >> $GITHUB_OUTPUT
           else
