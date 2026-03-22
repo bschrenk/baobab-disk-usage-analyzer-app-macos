@@ -144,6 +144,21 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
+          body: |
+            ## Baobab ${{ github.ref_name }} — macOS Build
+
+            **Baobab** (Disk Usage Analyzer) is a GNOME application for visualizing where disk space is used. It provides a tree view and a ring chart for exploring folder and device sizes.
+
+            This is an **unofficial macOS build** of the upstream GNOME project, automated by this repository. It is not affiliated with or endorsed by the GNOME project.
+
+            ### Upstream
+            - Source: [GNOME/baobab on GitLab](https://gitlab.gnome.org/GNOME/baobab)
+            - Release notes: [baobab ${{ github.ref_name }} on GNOME releases](https://gitlab.gnome.org/GNOME/baobab/-/releases/${{ github.ref_name }})
+
+            ### Installation
+            1. Download `Baobab.dmg`
+            2. Open the DMG and drag `Baobab.app` to your Applications folder
+            3. On first launch, right-click → Open to bypass Gatekeeper (app is unsigned)
           files: |
             Baobab.dmg
             Baobab.app.zip
