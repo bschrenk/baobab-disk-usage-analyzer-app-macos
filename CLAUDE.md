@@ -6,11 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Baobab** (Disk Usage Analyzer) is a GNOME application that helps users manage storage by scanning folders and devices and visualizing where disk space is used. It provides both a tree view and a graphical ring chart for exploring folder sizes. Upstream project: https://apps.gnome.org/Baobab/ — maintained by the GNOME project (Paolo Borelli, Christopher Davis), licensed GPL-2.0+.
 
-This repo is a **CI/CD packaging project** — it does not contain Baobab source code. It automates:
+This repo is a **CI/CD packaging pipeline** whose primary purpose is to produce a versioned `Baobab.dmg` and `Baobab.app` for the **`baobab-app` Homebrew Cask** formula. The cask formula references the GitHub Release URL and SHA256 from this repo's releases. It does not contain Baobab source code. It automates:
 1. Detecting new upstream GNOME Baobab releases (weekly cron job, Mondays)
 2. Building Baobab on macOS from the upstream source tarball
 3. Wrapping the result in a macOS `.app` bundle
-4. Packaging as a DMG and publishing a GitHub release
+4. Packaging as a DMG and publishing a GitHub Release (the artifact the Homebrew cask points to)
 
 ## Key Files
 
@@ -37,7 +37,7 @@ meson install -C build
 cd ..
 
 # Create the app bundle
-./scripts/create_app.sh "$PWD/install"
+./scripts/create_app.sh "$PWD/install" "$VERSION"
 
 # Create DMG
 hdiutil create -volname "Baobab" -srcfolder Baobab.app -ov -format UDZO Baobab.dmg
