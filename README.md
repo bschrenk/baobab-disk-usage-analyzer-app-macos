@@ -8,13 +8,7 @@ Looking for a free alternative to [DaisyDisk](https://daisydiskapp.com/) or [Squ
 
 ## Installing via Homebrew
 
-If `baobab-app` is available in the official [homebrew-cask](https://github.com/Homebrew/homebrew-cask) tap:
-
-```bash
-brew install --cask baobab-app
-```
-
-If the official cask is not yet available, you can install directly from this repository's cask:
+Official cask is not available because you need to pay for Gatekeeper, you can install directly from this repository's cask:
 
 ```bash
 brew install --cask bschrenk/homebrew-cask/baobab-app
@@ -24,7 +18,7 @@ brew install --cask bschrenk/homebrew-cask/baobab-app
 
 ## Manual Installation
 
-Download the latest `Baobab.dmg` from the [Releases](../../releases) page, open it, and drag `Baobab.app` to your Applications folder.
+Or Download the latest `Baobab.dmg` from the [Releases](../../releases) page, open it, and drag `Baobab.app` to your Applications folder.
 
 **Requirements:** macOS 11.0 (Big Sur) or later.
 
